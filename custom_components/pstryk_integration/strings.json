@@ -1,0 +1,14 @@
+{
+    "title": "Pstryk Integration",
+    "description": "Integracja z portalem Pstryk.pl",
+    "step": {
+        "user": {
+            "title": "Konfiguracja Pstryk",
+            "description": "Podaj klucz API i opcje debugowania.",
+            "data": {
+                "api_key": "Klucz API",
+                "debug": "Debugowanie"
+            }
+        }
+    }
+}
