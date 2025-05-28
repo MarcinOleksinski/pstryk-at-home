@@ -9,8 +9,8 @@ from .const import DOMAIN
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the Pstryk sensor platform."""
-    api_key = config_entry.data["api_key"]
-    nazwainstalacji = config_entry.data["NazwaInstalacji"]
+    api_key = config_entry.data.get("api_key")
+    nazwainstalacji = config_entry.data.get("NazwaInstalacji", "default")
     client = PstrykAPIClient(api_key)
     cache = LRU(100)
     async_add_entities([PstrykSensor(client, cache, nazwainstalacji)])
