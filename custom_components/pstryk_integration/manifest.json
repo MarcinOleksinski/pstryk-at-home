@@ -1,10 +1,10 @@
 {
     "domain": "pstryk_integration",
-    "name": "Pstryk Integration",
-    "version": "1.0.0",
+    "name": "Pstryk-at-Home",
+    "version": "0.0.1",
     "documentation": "https://github.com/ICTPartnerPL/pstryk-at-home",
     "requirements": ["requests"],
     "dependencies": [],
-    "codeowners": ["@ICTPartnerPL"],
+    "codeowners": ["@ICTPartnerPL", "@MarcinOleksinski"],
     "config_flow": true
 }
