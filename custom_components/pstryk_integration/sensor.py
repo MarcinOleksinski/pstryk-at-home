@@ -73,8 +73,15 @@ class PstrykHourlySensor(Entity):
                         "is_cheap": is_cheap,
                         "is_expensive": is_expensive
                     })
-        # Stan sensora: ostatnia cena netto
-        last_net = frames[-1]["net"] if frames else None
+        # Stan sensora: ostatnia cena netto (obsługa różnych kluczy)
+        def extract_net(frame):
+            return (
+                frame.get("net")
+                or frame.get("price_net")
+                or frame.get("price_net_avg")
+                or None
+            )
+        last_net = extract_net(frames[-1]) if frames else None
         self.cache[end_dt.isoformat()] = last_net
         self._state = last_net
         self._attr_extra_state_attributes = {
