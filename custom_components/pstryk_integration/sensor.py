@@ -17,14 +17,17 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class PstrykSensor(Entity):
     """Representation of a Pstryk sensor."""
 
+
     def __init__(self, client: PstrykAPIClient, cache: LRU):
         self.client = client
         self.cache = cache
         self._state = None
+        self._attr_unique_id = "sensor.pstryk_pricing_pstrykathome"
+
 
     @property
     def name(self):
-        return "Pstryk Pricing"
+        return "Pstryk Pricing pstrykathome"
 
     @property
     def state(self):
