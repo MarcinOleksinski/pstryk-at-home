@@ -1,4 +1,4 @@
 requests
 homeassistant
 voluptuous
-cachetools
+lru-dict
