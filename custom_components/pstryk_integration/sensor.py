@@ -54,10 +54,11 @@ class PstrykHourlySensor(Entity):
         start = start_dt.strftime("%Y-%m-%dT%H:00:00Z")
         end = end_dt.strftime("%Y-%m-%dT%H:00:00Z")
         data = await self.client.async_get_pricing("hour", start, end)
+        # Preferuj dane z frames jeśli są dostępne w odpowiedzi API
         frames = []
-        # LOG: dodajemy surową odpowiedź API do atrybutów dla debugowania
-        raw_api = data.copy() if isinstance(data, dict) else str(data)
-        if "prices" in data and isinstance(data["prices"], list):
+        if "frames" in data and isinstance(data["frames"], list):
+            frames = data["frames"]
+        elif "prices" in data and isinstance(data["prices"], list):
             for entry in data["prices"]:
                 hour = entry.get("hour") or entry.get("timestamp")
                 net = entry.get("price_net") or entry.get("price_net_avg") or entry.get("net")
@@ -79,8 +80,7 @@ class PstrykHourlySensor(Entity):
         self._attr_extra_state_attributes = {
             "frames": frames,
             "window_start": start,
-            "window_end": end,
-            "raw_api": raw_api  # DEBUG: surowa odpowiedź API
+            "window_end": end
         }
 
 # --- Daily Average Sensor ---
