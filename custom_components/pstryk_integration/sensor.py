@@ -25,11 +25,17 @@ class PstrykSensor(Entity):
         self.nazwainstalacji = nazwainstalacji
         self._state = None
         self._attr_unique_id = f"sensor.pstrykathome_{self.nazwainstalacji}_pricing"
+        self._attr_name = f"Pstrykathome {self.nazwainstalacji} Pricing"
+        self._attr_unit_of_measurement = "PLN"
+        self._attr_device_class = "monetary"
+        self._attr_state_class = "measurement"
+        self._attr_extra_state_attributes = {}
+
 
 
     @property
-    def name(self):
-        return f"Pstrykathome {self.nazwainstalacji} Pricing"
+    def extra_state_attributes(self):
+        return self._attr_extra_state_attributes
 
     @property
     def state(self):
@@ -37,6 +43,21 @@ class PstrykSensor(Entity):
 
     async def async_update(self):
         """Fetch new state data for the sensor."""
-        data = self.client.get_pricing("hour", "2025-05-27T22:00:00Z", "2025-05-28T22:00:00Z")
-        self.cache[data.get("price_net_avg")] = data
-        self._state = data.get("price_net_avg")
+        # Pobierz dane z API dla ostatnich 24h
+        import datetime
+        now = datetime.datetime.utcnow()
+        start = (now - datetime.timedelta(hours=24)).strftime("%Y-%m-%dT%H:00:00Z")
+        end = now.strftime("%Y-%m-%dT%H:00:00Z")
+        data = self.client.get_pricing("hour", start, end)
+        # Zakładamy, że API zwraca listę cen w polu "prices" lub podobnym
+        prices = data.get("prices") or []
+        # Jeśli nie ma listy, spróbuj z pojedynczą wartością
+        if not prices and "price_net_avg" in data:
+            prices = [data["price_net_avg"]]
+        self.cache[now.isoformat()] = prices[-1] if prices else None
+        self._state = prices[-1] if prices else None
+        self._attr_extra_state_attributes = {
+            "prices": prices,
+            "window_start": start,
+            "window_end": end
+        }
