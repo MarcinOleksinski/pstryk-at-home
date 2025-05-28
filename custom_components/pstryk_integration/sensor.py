@@ -10,24 +10,26 @@ from .const import DOMAIN
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the Pstryk sensor platform."""
     api_key = config_entry.data["api_key"]
+    nazwainstalacji = config_entry.data["NazwaInstalacji"]
     client = PstrykAPIClient(api_key)
     cache = LRU(100)
-    async_add_entities([PstrykSensor(client, cache)])
+    async_add_entities([PstrykSensor(client, cache, nazwainstalacji)])
 
 class PstrykSensor(Entity):
     """Representation of a Pstryk sensor."""
 
 
-    def __init__(self, client: PstrykAPIClient, cache: LRU):
+    def __init__(self, client: PstrykAPIClient, cache: LRU, nazwainstalacji: str):
         self.client = client
         self.cache = cache
+        self.nazwainstalacji = nazwainstalacji
         self._state = None
-        self._attr_unique_id = "sensor.pstryk_pricing_pstrykathome"
+        self._attr_unique_id = f"sensor.pstrykathome_{self.nazwainstalacji}_pricing"
 
 
     @property
     def name(self):
-        return "Pstryk Pricing pstrykathome"
+        return f"Pstrykathome {self.nazwainstalacji} Pricing"
 
     @property
     def state(self):

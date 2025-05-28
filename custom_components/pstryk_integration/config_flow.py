@@ -12,19 +12,22 @@ class PstrykConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
-        if user_input is not None:
-            return self.async_create_entry(title="Pstryk Integration", data=user_input)
-
-        return self.async_show_form(step_id="user", data_schema=self._get_schema())
-
-    @staticmethod
-    def _get_schema():
         from homeassistant.helpers import config_validation as cv
         import voluptuous as vol
-        return vol.Schema({
+        errors = {}
+        if user_input is not None:
+            # Sprawdź czy NazwaInstalacji nie zawiera spacji
+            if " " in user_input["NazwaInstalacji"]:
+                errors["NazwaInstalacji"] = "Nie używaj spacji w nazwie instalacji."
+            else:
+                return self.async_create_entry(title=f"Pstryk-at-Home [{user_input['NazwaInstalacji']}]", data=user_input)
+
+        schema = vol.Schema({
+            vol.Required("NazwaInstalacji", description={"suggested_value": "instalacja1"}): cv.matches(r'^[^\s]+$'),
             vol.Required("api_key"): cv.string,
             vol.Optional("debug", default=False): cv.boolean,
         })
+        return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
 
     # Opcje (rekonfiguracja)
     @staticmethod
@@ -43,6 +46,7 @@ class PstrykOptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_create_entry(title="Opcje Pstryk Integration", data=user_input)
 
         schema = vol.Schema({
+            # NazwaInstalacji nie jest edytowalna podczas rekonfiguracji
             vol.Required("api_key", default=self.config_entry.data.get("api_key", "")): cv.string,
             vol.Optional("debug", default=self.config_entry.data.get("debug", False)): cv.boolean,
         })
