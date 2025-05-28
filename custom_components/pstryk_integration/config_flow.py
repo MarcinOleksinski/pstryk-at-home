@@ -23,7 +23,7 @@ class PstrykConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=f"Pstryk-at-Home [{user_input['NazwaInstalacji']}]", data=user_input)
 
         schema = vol.Schema({
-            vol.Required("NazwaInstalacji", description={"suggested_value": "instalacja1"}): cv.matches(r'^[^\s]+$'),
+            vol.Required("NazwaInstalacji", description={"suggested_value": "instalacja1"}): vol.Match(r'^[^\s]+$'),
             vol.Required("api_key"): cv.string,
             vol.Optional("debug", default=False): cv.boolean,
         })
