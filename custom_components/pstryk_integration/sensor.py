@@ -43,15 +43,12 @@ class PstrykSensor(Entity):
 
     async def async_update(self):
         """Fetch new state data for the sensor."""
-        # Pobierz dane z API dla ostatnich 24h
         import datetime
         now = datetime.datetime.utcnow()
         start = (now - datetime.timedelta(hours=24)).strftime("%Y-%m-%dT%H:00:00Z")
         end = now.strftime("%Y-%m-%dT%H:00:00Z")
-        data = self.client.get_pricing("hour", start, end)
-        # Zakładamy, że API zwraca listę cen w polu "prices" lub podobnym
+        data = await self.client.async_get_pricing("hour", start, end)
         prices = data.get("prices") or []
-        # Jeśli nie ma listy, spróbuj z pojedynczą wartością
         if not prices and "price_net_avg" in data:
             prices = [data["price_net_avg"]]
         self.cache[now.isoformat()] = prices[-1] if prices else None
